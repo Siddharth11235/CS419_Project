@@ -34,7 +34,7 @@ def save_doc(lines, filename):
 	file.close()
 
 # load document
-in_filename = 'datasets/WW_Dataset.txt'
+in_filename = 'datasets/ww_test.txt'
 doc = load_doc(in_filename)
 
 # clean document
@@ -43,7 +43,7 @@ print('Total Tokens: %d' % len(tokens))
 print('Unique Tokens: %d' % len(set(tokens)))
 
 # organize into sequences of tokens
-length = 9
+length = 11
 sequences = list()
 for i in range(length, len(tokens)):
 	# select sequence of tokens
@@ -55,6 +55,6 @@ for i in range(length, len(tokens)):
 print('Total Sequences: %d' % len(sequences))
 
 # save sequences to file
-out_filename = 'datasets/WW_Dataset_seq.txt'
+out_filename = 'datasets/WW_test_seq.txt'
 save_doc(sequences, out_filename)
 

@@ -22,7 +22,7 @@ def load_doc(filename):
 	return text
 
 # load
-in_filename = 'datasets/WW_Dataset_seq.txt'
+in_filename = 'datasets/WW_test_seq.txt'
 doc = load_doc(in_filename)
 lines = doc.split('\n')
 
@@ -35,7 +35,7 @@ vocab_size = len(tokenizer.word_index) + 1
 
 aligned_sequneces = []
 for sequence in original_sequences:
-	aligned_sequence = np.zeros(9, dtype=np.int64)
+	aligned_sequence = np.zeros(11, dtype=np.int64)
 	aligned_sequence[:len(sequence)] = np.array(sequence, dtype=np.int64)
 	aligned_sequneces.append(aligned_sequence)
 
@@ -64,6 +64,6 @@ model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accur
 # fit model
 model.fit(X, y, batch_size=128, epochs=100)
 # save the model to file
-model.save('model.h5')
+model.save('Word_weights/plain_text_model.h5')
 # save the tokenizer
 dump(tokenizer, open('tokenizer.pkl', 'wb'))
