@@ -34,7 +34,7 @@ def save_doc(lines, filename):
 	file.close()
 
 # load document
-in_filename = 'datasets/ww_test.txt'
+in_filename = 'datasets/WW_Dataset.txt'
 doc = load_doc(in_filename)
 
 # clean document
@@ -55,6 +55,6 @@ for i in range(length, len(tokens)):
 print('Total Sequences: %d' % len(sequences))
 
 # save sequences to file
-out_filename = 'datasets/WW_test_seq.txt'
+out_filename = 'datasets/WW_Dataset_seq.txt'
 save_doc(sequences, out_filename)
 

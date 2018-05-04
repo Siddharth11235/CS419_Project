@@ -55,7 +55,7 @@ lines = doc.split('\n')
 original_sequences = tokenizer.texts_to_sequences(lines)
 aligned_sequneces = []
 for sequence in original_sequences:
-	aligned_sequence = np.zeros(9, dtype=np.int64)
+	aligned_sequence = np.zeros(11, dtype=np.int64)
 	aligned_sequence[:len(sequence)] = np.array(sequence, dtype=np.int64)
 	aligned_sequneces.append(aligned_sequence)
 
@@ -63,7 +63,7 @@ sequences = np.array(aligned_sequneces)
 seq_length = len(lines[0].split()) - 1
  
 # load the model
-model = load_model('model.h5')
+model = load_model('Word_weights/lstm_model.h5')
  
 # load the tokenizer
  

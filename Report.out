@@ -1,0 +1,20 @@
+\BOOKMARK [1][-]{section.1}{Motivation}{}% 1
+\BOOKMARK [1][-]{section.2}{Background}{}% 2
+\BOOKMARK [1][-]{section.3}{Objective}{}% 3
+\BOOKMARK [1][-]{section.4}{Dataset}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Attributes of the Dataset}{section.4}% 5
+\BOOKMARK [1][-]{section.5}{Algorithms}{}% 6
+\BOOKMARK [2][-]{subsection.5.1}{Preprocessing}{section.5}% 7
+\BOOKMARK [2][-]{subsection.5.2}{Character Level LSTM}{section.5}% 8
+\BOOKMARK [2][-]{subsection.5.3}{Character Level GRU}{section.5}% 9
+\BOOKMARK [2][-]{subsection.5.4}{Word Level GRU}{section.5}% 10
+\BOOKMARK [2][-]{subsection.5.5}{Word Level LSTM}{section.5}% 11
+\BOOKMARK [2][-]{subsection.5.6}{Neural Networks}{section.5}% 12
+\BOOKMARK [2][-]{subsection.5.7}{Linear Regression}{section.5}% 13
+\BOOKMARK [2][-]{subsection.5.8}{Random Forest Regression}{section.5}% 14
+\BOOKMARK [2][-]{subsection.5.9}{HMM Regression}{section.5}% 15
+\BOOKMARK [1][-]{section.6}{Conclusion and Future Work}{}% 16
+\BOOKMARK [1][-]{section.7}{References}{}% 17
+\BOOKMARK [2][-]{subsection.7.1}{SEER}{section.7}% 18
+\BOOKMARK [2][-]{subsection.7.2}{The 1000 Genome Project}{section.7}% 19
+\BOOKMARK [2][-]{subsection.7.3}{Others}{section.7}% 20

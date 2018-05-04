@@ -1,0 +1,419 @@
+\chapter{Linear Algorithms}
+One of the most important aspects to utilizing a high-performance computer effectively is to avoid unnecessary memory references. In most computers data flows
+from memory to registers and from registers to functional units, which perform the given instructions on the data. Performance [10] of the algorithms [6] can
+be dominated by the amount of memory traffic, rather than the floating point operations involved. The movement of data between memory and registers can be as
+costly as arithmetic operations on the data. This cost provides considerable motivation to restructure existing algorithms and to devise new algorithms that
+minimize data movement.
+
+\section{Basic Factorizations of Linear Equations}
+Overall system matrix [7,8,10] of many scientific and technical problems turns out to be in the form, $Ax=b$. Here $A$ is a real $nxn$ matrix and $b$ and $x$
+are the $x$ both real vectors of length $n$. $A$ may be dense or sparse matrix. Here we will develop algorithm for the dense coefficient matrix. Equivalently,
+it can be said that the solution of the linear system, given in equation 5.1, has to be found.
+\begin{equation}
+Ax=b
+\end{equation}
+\hspace{1in} To construct a numerical algorithm, we rely on the fundamental result from linear algebra that implies that a permutation matrix exists such that 
+\begin{equation}
+PA = LU
+\end{equation}
+where $L$ is the unit lower triangular matrix (ones on the diagonal) and $U$ is upper triangular. The matrix $U$ is non-singular if and only if the original
+coefficient matrix $A$ is non-singular. This factorization facilitates the solution of equation 5.1 through the successive solution of triangular systems
+\begin{equation}
+Ly = Pb, Ux = y
+\end{equation}
+The well known numerical technique for constructing this factorization is called Gaussian elimination [8,10] ] with partial pivoting. A brief development of
+this basic factorization is given in the next section. Variants of this factorization will be covered in the successive sections.
+
+\section{Point Algorithm}
+This is also known as Gaussian elimination with partial pivoting [10]. Let $P_{1}$ be a permutation matrix such that
+\begin{equation}
+P_{1}Ae_{1} =
+\left[\begin{array}{l}
+\delta \\
+c\\
+\end{array}\right]
+\end{equation}
+
+where is $|\delta| \geq |c^{T}e_{j}|$ for all j (i.e., $\delta$ is an element of largest magnitude in the first column). If $\delta \neq 0$, put $l=c
+\delta^{-1}$; otherwise put $l=0$. Then
+\begin{equation}
+P_{1}A = 
+\left[\begin{array}{ll}
+\delta & u^{T}\\
+c & \hat{A} \\
+\end{array}\right] =
+\left[\begin{array}{ll}  
+1 & 0 \\
+l & I \\
+\end{array}\right]
+\left[\begin{array}{ll}
+\delta & u^{T}\\
+0 & \hat{A}-lu^{T} \\
+\end{array}\right]
+\end{equation}
+
+Suppose now that $\hat{L}\hat{U} = \hat{P}(\hat{A}-lu^{T})$, then
+\begin{equation}
+\left[\begin{array}{ll}
+1 & 0\\
+0 & \hat{p}\\
+\end{array}\right]
+P_{1}A =
+\left[\begin{array}{ll}
+1 & 0 \\
+\hat{P}l & \hat{L} \\
+\end{array}\right]
+\left[\begin{array}{ll}
+\delta & u^{T}\\
+0 & \hat{U} \\
+\end{array}\right]   
+\end{equation}
+
+and $PA = LU$. This discussion provides the basis for an inductive construction of the factorization $PA = LU$. Now, repeat the basic factorization steps on 
+the "reduced matrix" $\hat{A}-lu^{T}$ and continuing in this way until the final factorization has been achieved in the form
+\begin{equation}
+A = (P_{1}^{T}L_{1}P_{2}^{T}L_{2}P_{3}^{T}L_{3}.....P_{n-1}^{T}L_{n-1})U
+\end{equation} 
+with each $P_{i}$ representing a permutation in the $(i, k_{i})$ position where $k_{i} \geq i$. This representation leads to the following numerical procedure
+for the solution of equation 5.1.\par
+\hspace{1in}for $j = 1$ step $1$ until $n$ \par
+\hspace{1.4in}$b \leftarrow L_{j}^{-1}P_{j}b$;\par
+\hspace{1in}end;\par
+\hspace{1in}Solve $Ux = b$;
+
+\section{Blocked Algorithms}
+Many algorithm didn't perform near the expected level on the powerful machines. The key to achieving high performance on these advance architectures has been
+to recast the algorithm in terms of matrix-vector [7,10] and matrix-matrix operations to permit reuse of data. To derive these variants, a method block
+factorization will be studied. One can construct the factorization by analyzing the way in which the various pieces of the factorization interact. Let us
+consider the decomposition of the matrix $A$ into its $LU$ factorization [8] with the matrix partitioned in the following way. Let us suppose that we have
+factored
+$A$ as $A = LU$. This can be written in the following form, where the factors are in block form.
+\begin{equation}
+\left[\begin{array}{lll}
+A_{11} & A_{12} & A_{13}\\
+A_{21} & A_{22} & A_{23}\\
+A_{31} & A_{32} & A_{33}\\
+\end{array}\right]=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & L_{22} & 0\\
+L_{31} & L_{32} & L_{33}\\
+\end{array}\right]     
+\left[\begin{array}{lll}
+U_{11} & U_{12} & U_{13}\\
+0 & U_{22} & U_{23}\\
+0 & 0 & U_{33}\\
+\end{array}\right]
+\end{equation}  
+
+Multiplying $L$ and $U$ together and equating terms with $A$, the following will result:
+
+%\begin{equation}
+%$$A_{11} = L_{11}U_{11}, A_{12} = L_{11}U_{12}, A_{13} = L_{11}U_{13} $$
+%$$A_{21} = L_{21}U_{11}, A_{22} = L_{21}U_{12}+L_{22}U_{22}, A_{23} = L_{21}U_{13}+L_{22}U_{23}$$ 
+%$$A_{31} = L_{31}U_{11}, A_{32} = L_{11}U_{12}+L_{32}U_{22}, A_{33} = L_{31}U_{13}+L_{32}U_{23}+L_{33}U_{33}$$
+%\end{equation}
+
+\begin{equation}
+\begin{array}{lll}
+A_{11} = L_{11}U_{11}, & A_{12} = L_{11}U_{12}, & A_{13} = L_{11}U_{13} \\
+A_{21} = L_{21}U_{11}, & A_{22} = L_{21}U_{12}+L_{22}U_{22}, & A_{23} = L_{21}U_{13}+L_{22}U_{23}\\
+A_{31} = L_{31}U_{11}, & A_{32} = L_{11}U_{12}+L_{32}U_{22}, & A_{33} = L_{31}U_{13}+L_{32}U_{23}+L_{33}U_{33}\\
+\end{array}
+\end{equation}
+
+With these simple relationships, variants can be developed by postponing the formation of certain components and also by manipulating the order in which they
+are formed. A crucial factor for performance is the choice of the blocksize, $k$, i.e. column width, of the second block column. A blocksize of 1 will produce
+matrix-vector algorithm and for $k>1$ matrix-matrix algorithms will be produced. Machine dependent parameters such as cache size, number of vector registers,
+and memory bandwidth will dictate the best choice for the blocksize. \par
+\hspace{1in} Three natural variants occur: right-looking [10], left-looking[10], and hybrid of these two, named as Crout [10]. The left-looking variants
+computes one block column at a time using previously computed columns. The right-looking variant computes a block row and column at each step and uses them to
+update the trailing sub-matrix. The Crout variant is a hybrid algorithm in which a block row and column are computed at each step and using previously computed
+rows and previously computed columns. These variants  have been called the $i,j,k$ variants owing to the arrangements of loops in the algorithm. The terms
+right and left refer to the regions of data access.
+\subsection{Right-Looking algorithm}
+Suppose that a partial factorization of A has been obtained so that the first $k$ columns of $L$ and the first $k$ rows of $U$ have been evaluated. The
+factorization will be in the form of:\\
+STEP 1:
+\begin{equation}  
+PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & I & 0\\
+L_{31} & 0 & I\\
+\end{array}\right]
+\left[\begin{array}{lll}
+U_{11} & U_{12} & U_{13}\\
+0 & \hat{A_{22}} & \hat{A_{23}}\\
+0 & \hat{A_{32}} & \hat{A_{33}}\\
+\end{array}\right]
+\end{equation}
+where $L_{11}$ and $U_{11}$ are $k$x$k$ matrices and $P$ is a permutation matrix representing the effects of pivoting. The blocks labeled $\hat{A_{ij}}$ are
+the updated portion of $A$ and has not yet been factored, and will be referred to as the active sub-matrix.\\
+STEP 2:
+\begin{equation}  
+\left[\begin{array}{ll}
+ I  & 0 \\
+ 0  & P_{2}\\
+\end{array}\right] PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & L_{22} & 0\\
+L_{31} & L_{32} & I\\
+\end{array}\right]
+\left[\begin{array}{lll}
+U_{11} & U_{12} & U_{13}\\
+0 & U_{22} & U_{23}\\
+0 & 0 & \hat{A_{33}}\\
+\end{array}\right]
+\end{equation}
+where $P_{2}$ is the permutation matrix of the order $n-k$.\\
+STEP 3:
+\begin{equation}
+P_{2}
+\left[\begin{array}{l}
+ \hat{A_{22}}\\
+ \hat{A_{32}}\\     
+\end{array}\right]=
+\left[\begin{array}{l}  
+L_{22}\\
+L_{32}\\ 
+\end{array}\right]U_{22}
+\end{equation}
+\\
+STEP 4:
+\begin{equation}
+\left[\begin{array}{l}  
+ \hat{A_{22}}\\ 
+ \hat{A_{32}}\\  
+\end{array}\right] \leftarrow
+P_{2}  
+\left[\begin{array}{l}  
+ \hat{A_{22}}\\ 
+ \hat{A_{32}}\\  
+\end{array}\right]
+\end{equation}
+and 
+\begin{equation}
+\left[\begin{array}{l}
+L_{21}\\
+L_{31}\\
+\end{array}\right] \leftarrow
+P_{2}
+\left[\begin{array}{l}
+L_{21}\\
+L_{31}\\
+\end{array}\right]
+\end{equation}\\
+STEP 5:
+Solve the triangular system
+\begin{equation}
+U_{23} = L_{22}^{-1}\hat{A_{23}}
+\end{equation}
+to compute the next block row of $U$. 
+\\
+STEP 6: Update $\hat{A_{33}}$
+\begin{equation}
+\hat{A_{33}} \leftarrow \hat{A_{33}} - L_{32}U_{23}
+\end{equation}\\
+STEP 6: $repeat$ the STEP 2 - STEP 6, $until$ $A=LU$
+
+The main advantage of the block partitioned form of the LU factorization algorithm is that the updating of $\hat{A_{33}}$ involves a matrix-matrix operation if
+the block size is greater than 1. Matrix-Matrix operations generally perform more efficiently than matrix-vector operations on a high performance computer. The
+original array $A$ may be used to store the factorization, since $L$ is unit lower triangular and $U$ is upper triangular. The additional zeros and
+ones appearing in the representation do not need to be stored explicitly.
+
+\subsection{Left-Looking algorithm}
+From the standpoint of data access this is the best algorithm of the three.\\
+STEP 1: Assume that
+\begin{equation}
+PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & I & 0\\
+L_{31} & 0 & I\\
+\end{array}\right]
+\left[\begin{array}{lll}
+U_{11} & A_{12} & A_{13}\\
+0 & A_{22} & A_{23}\\
+0 & A_{32} & A_{33}\\
+\end{array}\right]
+\end{equation}\\
+STEP 2:
+\begin{equation}
+\left[\begin{array}{ll}
+ I  & 0 \\
+ 0  & P_{2}\\   
+\end{array}\right] PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & L_{22} & 0\\
+L_{31} & L_{32} & I\\
+\end{array}\right]
+\left[\begin{array}{lll}
+U_{11} & U_{12} & A_{13}\\
+0 & U_{22} & A_{23}\\   
+0 & 0 & A_{33}\\
+\end{array}\right]
+\end{equation}\\
+STEP 3: Solve the triangular system
+\begin{equation}
+U_{12} = L_{11}^{-1}A_{12}
+\end{equation}\\
+STEP 4: Update the rest of the middle block column of U,
+\begin{equation}
+\left[\begin{array}{l}
+\hat{A_{22}} \\
+\hat{A_{32}} \\
+\end{array}\right] \leftarrow
+\left[\begin{array}{l}
+A_{22} \\
+A_{32}\\
+\end{array}\right] - 
+\left[\begin{array}{l}
+L_{21}\\
+L_{31}\\
+\end{array}\right]U_{12}
+\end{equation}\\
+STEP 5: Perform the factorization
+\begin{equation}
+P_{2}
+\left[\begin{array}{l}
+\hat{A_{22}} \\
+\hat{A_{32}} \\
+\end{array}\right] =
+\left[\begin{array}{l}
+L_{22} \\
+L_{32}\\
+\end{array}\right] U_{22}
+\end{equation}\\
+STEP 6: Lastly the pivoting
+\begin{equation}
+\left[\begin{array}{l}
+A_{23} \\
+A_{33} \\
+\end{array}\right] \leftarrow
+P_{2}
+\left[\begin{array}{l}
+A_{23} \\
+A_{33}\\
+\end{array}\right]
+\end{equation}
+and
+\begin{equation}
+\left[\begin{array}{l}
+L_{21} \\
+L_{31} \\
+\end{array}\right] \leftarrow
+P_{2}
+\left[\begin{array}{l}
+L_{21}\\
+L_{31}\\
+\end{array}\right]
+\end{equation}\\
+It can be seen that the data accesses all occur to the left of the block column being updated. Moreover, the only write access occurs within this block column.
+Matrix elements to the right are referenced only for pivoting purposes, and even this procedure may be postponed until needed with a simple rearrangement of
+the above operations. The original array $A$ may be used to store the factorization, since $L$ is unit lower triangular and $U$ is upper triangular. The
+additional zeros and ones appearing in the representation do not need to be stored explicitly.
+
+\subsection{Crout Algorithm}
+The Crout variant is best suited for vector machines with enough memory bandwidth to support the maximum computational rate of the vector units. This algorithm
+requires fewer memory references than the right-looking algorithm.\\
+STEP 1: Assume that
+\begin{equation}
+PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+0 & I & 0\\
+0 & 0 & I\\
+\end{array}\right]    
+\left[\begin{array}{lll}
+I & U_{12} & U_{13}\\
+L_{21} & A_{22} & A_{23}\\   
+L_{31} & A_{32} & A_{33}\\
+\end{array}\right]   
+\left[\begin{array}{lll}
+U_{11} & 0 & 0\\
+0 & I & 0\\
+0 & 0 & I\\
+\end{array}\right]
+\end{equation}\\
+STEP 2: For factorization,solve
+\begin{equation}
+\left[\begin{array}{ll}
+A_{22} & A_{23}\\  
+\end{array}\right] \leftarrow
+\left[\begin{array}{ll} 
+A_{22} & A_{23}\\ 
+\end{array}\right] - L_{12}
+\left[\begin{array}{ll} 
+U_{12} & U_{13}\\ 
+\end{array}\right] 
+\end{equation}\\
+and
+\begin{equation}
+A_{32} \leftarrow A_{32} - L_{31}U_{12}
+\end{equation}\\
+STEP 3: Do factorization 
+\begin{equation}
+P_{2}
+\left[\begin{array}{l}
+A_{22} \\
+A_{32} \\
+\end{array}\right] =
+\left[\begin{array}{l}
+L_{22} \\
+L_{32}\\
+\end{array}\right] U_{22}
+\end{equation}\\
+STEP 4: Replace
+\begin{equation}
+\left[\begin{array}{l}
+A_{23} \\
+A_{33} \\
+\end{array}\right] \leftarrow
+P_{2}   
+\left[\begin{array}{l}
+A_{23} \\
+A_{33}\\
+\end{array}\right]
+\end{equation}
+and
+\begin{equation}
+\left[\begin{array}{l}
+L_{21} \\
+L_{31} \\
+\end{array}\right] \leftarrow
+P_{2}
+\left[\begin{array}{l}
+L_{21}\\
+L_{31}\\
+\end{array}\right]
+\end{equation}
+and put
+\begin{equation}
+U_{23} = L_{21}^{-1}A_{23}
+\end{equation}\\
+STEP 5: 
+\begin{equation}
+P_{2}PA=
+\left[\begin{array}{lll}
+L_{11} & 0 & 0\\
+L_{21} & L_{22} & 0\\
+0 & 0 & I\\
+\end{array}\right]
+\left[\begin{array}{lll}
+I & 0 & U_{13}\\  
+0 & I & U_{23}\\
+L_{31} & L_{32} & A_{33}\\ 
+\end{array}\right]
+\left[\begin{array}{lll}
+U_{11} & U_{12} & 0\\  
+0 & U_{22} & 0\\
+0 & 0 & I\\
+\end{array}\right]
+\end{equation}\\
+STEP 6: $repeat$ STEP 2 - STEP 5 $until$ $LU$ decomposition complete.\\
+\\
+The lower triangular factor $L_{11}$ and the upper triangular factor $U_{11}$ may occupy the left-hand corner of the original $n$x$n$ array. Thus, the original
+array $A$ may be overwritten with this factorization as it is computed.

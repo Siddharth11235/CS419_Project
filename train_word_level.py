@@ -22,7 +22,7 @@ def load_doc(filename):
 	return text
 
 # load
-in_filename = 'datasets/WW_test_seq.txt'
+in_filename = 'datasets/WW_Dataset_seq.txt'
 doc = load_doc(in_filename)
 lines = doc.split('\n')
 
@@ -47,14 +47,15 @@ y = sequences[:,-1]
 y = to_categorical(y, num_classes=vocab_size)
 X = sequences[:,:-1]
 seq_length = X.shape[1]
+print (seq_length)
 X_train = np.reshape(X, (X.shape[0], 1, X.shape[1]))
 
 
 # define model
 model = Sequential()
 model.add(Embedding(vocab_size, 50, input_length=seq_length))
-model.add(GRU(256, return_sequences=True))
-model.add(GRU(256))
+model.add(GRU(128, return_sequences=True))
+model.add(GRU(128))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(128, activation='relu'))
 model.add(Dense(vocab_size, activation='softmax'))
@@ -62,8 +63,8 @@ print(model.summary())
 # compile model
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 # fit model
-model.fit(X, y, batch_size=128, epochs=100)
+model.fit(X, y, batch_size=128, epochs=100, validation_split = 0.2)
 # save the model to file
-model.save('Word_weights/plain_text_model.h5')
+model.save('Word_weights/GRU_model.h5')
 # save the tokenizer
 dump(tokenizer, open('tokenizer.pkl', 'wb'))

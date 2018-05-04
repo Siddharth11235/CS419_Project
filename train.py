@@ -1,7 +1,9 @@
+
 from __future__ import print_function
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
 from keras.layers import Dense, Activation
+from keras.layers import GRU
 from keras.layers import LSTM
 from keras.optimizers import RMSprop
 from keras.utils.data_utils import get_file
@@ -41,12 +43,12 @@ for i, sentence in enumerate(sentences):
 # build the model: a single LSTM
 print('Build model...')
 model = Sequential()
-model.add(LSTM(128, input_shape=(maxlen, len(chars))))
+model.add(LSTM(135, input_shape=(maxlen, len(chars))))
 model.add(Dense(len(chars)))
 model.add(Activation('softmax'))
 
 optimizer = RMSprop(lr=0.01)
-model.compile(loss='categorical_crossentropy', optimizer=optimizer)
+model.compile(loss='categorical_crossentropy', optimizer=optimizer,metrics=['accuracy'])
 
 
 def sample(preds, temperature=1.0):
@@ -65,7 +67,7 @@ def on_epoch_end(epoch, logs):
     print('----- Generating text after Epoch: %d' % epoch)
 
     start_index = random.randint(0, len(text) - maxlen - 1)
-    for diversity in [0.2, 0.5, 1.0, 1.2]:
+    for diversity in [0.5, 0.7]:
         print('----- diversity:', diversity)
 
         generated = ''
@@ -94,9 +96,7 @@ print_callback = LambdaCallback(on_epoch_end=on_epoch_end)
 
 model.fit(x, y,
           batch_size=128,
-          epochs=6,
+          epochs=13,
           callbacks=[print_callback])
-json_string = model.to_json()
-with open('Char_level_weights/char_level_mod.h5', 'w') as f:
-            f.write(json_string)
-model.save_weights('Char_level_weights/char_level_weights.h5', overwrite=True)
+model.save('Char_weights/char_level_lstm.h5')
+model.save_weights('Char_weights/char_level_weights.h5', overwrite=True)

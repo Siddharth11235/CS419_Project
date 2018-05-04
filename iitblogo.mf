@@ -1,0 +1,613 @@
+% IITB Logo - in char "a"
+% Mosh@cse.iitb.ernet.in, 29-Apr-93.
+
+% These should be command line parameters:
+% screen_rows:=600; screen_columns:=700; screenstrokes;
+% mode:=sun;			% For testing on SUN.
+% mode:=RicohFourZeroEightZero; % For Dept QMS-laser-printer.
+% mag:=1.2*1.2*1.2; fontmaking:=1; 
+mode_setup; 			
+
+logo_width#=72pt#; logo_height#=72pt#;
+
+define_pixels(logo_width,logo_height);
+ 
+beginchar("a",logo_width#,logo_height#,0);
+message "The IIT Bombay Logo";
+pickup pencircle scaled .4pt;
+
+% draw (0,0)--(0,h)--(w,h)--(w,0)--cycle;	% The bounding box.
+
+% Explanations: The main points in the logo are:
+% 1) gear_center, and five concentric circles of radius
+%      gear_radius[1..5],
+%    ra=gear_radius[1] is used as the unit of measure later on.
+%    There are 10 points on the wheel, between which occur the tooths.
+%    The gear has 9 tooths at regular angles, 
+%       each tooth has a left and a right point
+%    Two of the circles mark points for the English writing.
+% 2) flower_center, it lies above gear center.
+%    The flower has 12 petals: 4+1+4 above, 1+1+1 below,
+%    each petal has a petal_tip and a petal_base.
+%    petal_tip[11] lies on gear center, and its lowest part lies
+%    on the point flower_low. Then there is this flower stem.
+% 3) banner_center, lies below the gear_center.
+%    It consists of 5 concentric circles, that form the banner
+%    ban_rad[1..5]. These include the two flaps on each side.
+%    The angles on the banner are noted by ban_rim[][].
+%    Two of the ban_rad draw lines for the writing in hindi. 
+%    The macro mid(_,_), allows picking of points for hindi
+%    lettering in a 10x10 grid.
+%    Other macros give relative direction to letter strokes.
+% 4) The open book consists of about 9 points and some illegible
+%    writing in it.
+%
+
+% \input gear_outline.mf
+%%% THE GEAR %%%
+message "The gear outline";
+% for drawing the toothed wheel.
+def :: = --- enddef; 
+
+base_space = 03/100*w;
+char_height = 04/100*w;
+gear_radius1 = 30/100*w;
+tooth_height = 7/100*w;
+ra:=gear_radius1; % we use "ra" a the unit mesaurement later.
+
+gear_radius2 = gear_radius1 + base_space;
+gear_radius3 = gear_radius2 + char_height;
+gear_radius4 = gear_radius3 + base_space;
+gear_radius5 = gear_radius4 + tooth_height;
+pair
+  gear_center, wheel[][],
+  tooth_center[][], tooth_left[][], tooth_right[][];
+gear_center = (w/2,h/2);
+% drawdot gear_center;
+
+for rad = 1 upto 4:
+ for i = 1 upto 10:
+  wheel[rad][i] = gear_center + gear_radius[rad] * dir((i-1)*30-45);
+  % draw gear_center..wheel[rad][i];
+ endfor;
+endfor
+
+for rad = 4 upto 5:
+ for i = 1 upto 9:
+  tooth_center[rad][i] = gear_center + gear_radius[rad] * dir((i-1)*30-30);
+  % draw gear_center..tooth_center[rad][i];
+ endfor;
+endfor
+
+ for i = 1 upto 9:
+  tooth_left[4][i]  = gear_center + gear_radius[4] * dir((i-1)*30-30+8.5);
+  % draw gear_center..tooth_left[4][i];
+  tooth_right[4][i] = gear_center + gear_radius[4] * dir((i-1)*30-30-8.5);
+  % draw gear_center..tooth_right[4][i];
+  tooth_left[5][i]  = gear_center + gear_radius[5] * dir((i-1)*30-30+6);
+  % draw gear_center..tooth_left[5][i];
+  tooth_right[5][i] = gear_center + gear_radius[5] * dir((i-1)*30-30-6);
+  % draw gear_center..tooth_right[5][i];
+ endfor;
+
+draw wheel[4][1]..wheel[1][1];
+draw wheel[1][1]..wheel[1][2]..wheel[1][3]..wheel[1][4]..wheel[1][5]..
+     wheel[1][6]..wheel[1][7]..wheel[1][8]..wheel[1][9]..wheel[1][10];
+draw wheel[1][10]..wheel[4][10];
+draw
+     wheel[4][10]::
+	tooth_left[4][9]::tooth_left[5][9]::tooth_right[5][9]::tooth_right[4][9]::
+     wheel[4][9]::
+	tooth_left[4][8]::tooth_left[5][8]::tooth_right[5][8]::tooth_right[4][8]::
+     wheel[4][8]::
+	tooth_left[4][7]::tooth_left[5][7]::tooth_right[5][7]::tooth_right[4][7]::
+     wheel[4][7]::
+	tooth_left[4][6]::tooth_left[5][6]::tooth_right[5][6]::tooth_right[4][6]::
+     wheel[4][6]::
+	tooth_left[4][5]::tooth_left[5][5]::tooth_right[5][5]::tooth_right[4][5]::
+     wheel[4][5]::
+	tooth_left[4][4]::tooth_left[5][4]::tooth_right[5][4]::tooth_right[4][4]::
+     wheel[4][4]::
+	tooth_left[4][3]::tooth_left[5][3]::tooth_right[5][3]::tooth_right[4][3]::
+     wheel[4][3]::
+	tooth_left[4][2]::tooth_left[5][2]::tooth_right[5][2]::tooth_right[4][2]::
+     wheel[4][2]::
+	tooth_left[4][1]::tooth_left[5][1]::tooth_right[5][1]::tooth_right[4][1]::
+     wheel[4][1];
+
+% \input gear_letters.mf
+%%% THE WRITING IN THE GEAR %%%
+message "The writing in the gear: INDIAN INSTITUTE OF TECHNOLOGY BOMBAY ";
+% For writing inside the gear.
+def top(expr t) = point t of top_line enddef;
+def bot(expr t) = point t of bottom_line enddef;
+def myup(expr t) = top(t)-bot(t) enddef;
+def mydown(expr t) = bot(t)-top(t) enddef;
+def myright(expr t) = top(t+char_size)-top(t) enddef;
+def myleft(expr t) = top(t)-top(t+char_size) enddef;
+% pickup pencircle scaled .8pt;
+path bottom_line,top_line;
+bottom_line =
+   wheel[2][10]..wheel[2][9]..wheel[2][8]..wheel[2][7]..wheel[2][6]..
+   wheel[2][5]..wheel[2][4]..wheel[2][3]..wheel[2][2]..wheel[2][1];
+top_line =
+   wheel[3][10]..wheel[3][9]..wheel[3][8]..wheel[3][7]..wheel[3][6]..
+   wheel[3][5]..wheel[3][4]..wheel[3][3]..wheel[3][2]..wheel[3][1];
+% draw bottom_line; draw top_line;
+% draw point 0 of top_line .. point 10 of top_line;
+
+numeric t, char_space, char_size;
+char_space=0.08;
+char_size=0.17;
+t:=0.3;
+
+% I
+draw bot(t)--top(t);
+t:=t+1.2char_space;
+% N
+draw bot(t)--top(t)--bot(t+char_size)--top(t+char_size); 
+t:=t+char_space+char_size;
+% D
+draw bot(t)--top(t)
+       {myright(t)}..{mydown(t+char_size)}
+     (.5[top(t+char_size),bot(t+char_size)])
+       {mydown(t+char_size)}..{myleft(t)}
+     bot(t); 
+t:=t+char_space+char_size;
+% I
+draw bot(t)..top(t); 
+t:=t+char_space;
+% A
+draw bot(t)--top(t+.5char_size)--bot(t+char_size);
+draw .4[bot(t),top(t+.5char_size)] -- .4[bot(t+char_size),top(t+.5char_size)];
+t:=t+char_space+char_size;
+% N
+draw bot(t)--top(t)--bot(t+char_size)--top(t+char_size); 
+t:=t+char_space+2char_size;
+
+% I
+draw bot(t)--top(t);
+t:=t+1.2char_space;
+% N
+draw bot(t)--top(t)--bot(t+char_size)--top(t+char_size); 
+t:=t+char_space+char_size;
+% S
+draw bot(t)
+           {myright(t)}..{myup(t+char_size)}
+     .7[top(t+char_size),bot(t+char_size)]
+           {myup(t+char_size)}..
+     .5[bot(t+char_size),top(t)]
+           ..{myup(t)}
+     .7[bot(t),top(t)]
+           {myup(t)}..{myright(t)}
+     top(t+char_size);
+t:=t+char_space+char_size;
+% T
+draw bot(t+.5char_size)--top(t+.5char_size);
+draw top(t)--top(t+char_size);
+t:=t+char_space+char_size;
+% I
+draw bot(t)--top(t);
+t:=t+char_space;
+% T
+draw bot(t+.5char_size)--top(t+.5char_size);
+draw top(t)--top(t+char_size);
+t:=t+char_space+char_size;
+% U
+draw top(t) {mydown(t)}..{myright(t)} bot(t+.5char_size)
+     {myright(t)}..{myup(t+char_size)} top(t+char_size);
+t:=t+char_space+char_size;
+% T
+draw bot(t+.5char_size)--top(t+.5char_size);
+draw top(t)--top(t+char_size);
+t:=t+char_space+char_size;
+% E
+draw bot(t)--top(t);
+draw bot(t)--bot(t+char_size);
+draw top(t)--top(t+char_size);
+draw .5[bot(t),top(t)]--.5[bot(t+char_size),top(t+char_size)];
+t:=t+char_space+2char_size;
+% 
+% O
+draw top(t+.5char_size)
+         {myright(t+.5char_size)}..{mydown(t+char_size)}
+     (.5[top(t+char_size),bot(t+char_size)])
+         {mydown(t+char_size)}..{myleft(t+.5char_size)}
+     bot(t+.5char_size)
+         {myleft(t+.5char_size)}..{myup(t)}
+     (.5[top(t),bot(t)])
+         {myup(t)}..{myright(t+.5char_size)}
+     top(t+.5char_size);
+t:=t+char_space+char_size;
+% F
+draw bot(t)--top(t);
+draw top(t)--top(t+char_size);
+draw .5[bot(t),top(t)]--.5[bot(t+char_size),top(t+char_size)];
+t:=t+char_space+2char_size;
+
+% T
+draw bot(t+.5char_size)--top(t+.5char_size);
+draw top(t)--top(t+char_size);
+t:=t+char_space+char_size;
+% E
+draw bot(t)--top(t);
+draw bot(t)--bot(t+char_size);
+draw top(t)--top(t+char_size);
+draw .5[bot(t),top(t)]--.5[bot(t+char_size),top(t+char_size)];
+t:=t+char_space+char_size;
+% C
+draw top(t+char_size)
+         {myleft(t+char_size)}..{mydown(t)}
+     (.5[top(t),bot(t)])
+         {mydown(t)}..{myright(t+char_size)}
+     bot(t+char_size);
+t:=t+char_space+char_size;
+% H
+draw bot(t)--top(t);
+draw bot(t+char_size)--top(t+char_size);
+draw .5[bot(t),top(t)]--.5[bot(t+char_size),top(t+char_size)];
+t:=t+char_space+char_size;
+% N
+draw bot(t)--top(t)--bot(t+char_size)--top(t+char_size); 
+t:=t+char_space+char_size;
+% O
+draw top(t+.5char_size)
+         {myright(t+.5char_size)}..{mydown(t+char_size)}
+     (.5[top(t+char_size),bot(t+char_size)])
+         {mydown(t+char_size)}..{myleft(t+.5char_size)}
+     bot(t+.5char_size)
+         {myleft(t+.5char_size)}..{myup(t)}
+     (.5[top(t),bot(t)])
+         {myup(t)}..{myright(t+.5char_size)}
+     top(t+.5char_size);
+t:=t+char_space+char_size;
+% L
+draw top(t)--bot(t)--bot(t+char_size);
+t:=t+char_space+char_size;
+% O
+draw top(t+.5char_size)
+         {myright(t+.5char_size)}..{mydown(t+char_size)}
+     (.5[top(t+char_size),bot(t+char_size)])
+         {mydown(t+char_size)}..{myleft(t+.5char_size)}
+     bot(t+.5char_size)
+         {myleft(t+.5char_size)}..{myup(t)}
+     (.5[top(t),bot(t)])
+         {myup(t)}..{myright(t+.5char_size)}
+     top(t+.5char_size);
+t:=t+char_space+char_size;
+% G
+draw top(t+char_size)
+         {myleft(t+char_size)}..{mydown(t)}
+     (.5[top(t),bot(t)])
+         {mydown(t)}..{myright(t+.5char_size)}
+     bot(t+char_size)--(.4[bot(t+char_size),top(t+char_size)]);
+t:=t+char_space+char_size;
+% Y
+draw top(t)--.5[top(t),bot(t+char_size)]--top(t+char_size);
+draw .5[top(t),bot(t+char_size)]--bot(t+.5char_size);
+t:=t+char_space+2char_size;
+
+% B
+draw bot(t)--top(t)
+       {myright(t)}..{mydown(t+char_size)}
+     (.20[top(t+char_size),bot(t+char_size)])
+       {mydown(t+char_size)}..{myleft(t)}
+     (.55[top(t),bot(t)])
+       {myright(t)}..{mydown(t+char_size)}
+     (.30[bot(t+char_size),top(t+char_size)])
+       {mydown(t+char_size)}..{myleft(t)}
+     bot(t); 
+t:=t+char_space+char_size;
+% O
+draw top(t+.5char_size)
+         {myright(t+.5char_size)}..{mydown(t+char_size)}
+     (.5[top(t+char_size),bot(t+char_size)])
+         {mydown(t+char_size)}..{myleft(t+.5char_size)}
+     bot(t+.5char_size)
+         {myleft(t+.5char_size)}..{myup(t)}
+     (.5[top(t),bot(t)])
+         {myup(t)}..{myright(t+.5char_size)}
+     top(t+.5char_size);
+t:=t+char_space+char_size;
+% M
+draw bot(t)--top(t)--.1[bot(t+.5char_size),top(t+.5char_size)]
+     --top(t+char_size)--bot(t+char_size);
+t:=t+char_space+char_size;
+% B
+draw bot(t)--top(t)
+       {myright(t)}..{mydown(t+char_size)}
+     (.20[top(t+char_size),bot(t+char_size)])
+       {mydown(t+char_size)}..{myleft(t)}
+     (.55[top(t),bot(t)])
+       {myright(t)}..{mydown(t+char_size)}
+     (.30[bot(t+char_size),top(t+char_size)])
+       {mydown(t+char_size)}..{myleft(t)}
+     bot(t); 
+t:=t+char_space+char_size;
+% A
+draw bot(t)--top(t+.5char_size)--bot(t+char_size);
+draw .4[bot(t),top(t+.5char_size)] -- .4[bot(t+char_size),top(t+.5char_size)];
+t:=t+char_space+char_size;
+% Y
+draw top(t)--.5[top(t),bot(t+char_size)]--top(t+char_size);
+draw .5[top(t),bot(t+char_size)]--bot(t+.5char_size);
+
+% \input banner_outline.mf
+%%% OUTLINE OF THE BANNER BELOW %%%
+message "The Banner Outline";
+pair banner_center;
+banner_center = (xpart gear_center, ypart(gear_center)-3.1*gear_radius[1]);
+
+flap_space = .9char_height;
+hbs := base_space;
+hch := char_height;
+
+numeric ban_rad[];
+ban_rad1 := 1.7 * gear_radius1;
+ban_rad2 := ban_rad1 + flap_space;
+ban_rad3 := ban_rad2 + hbs;
+ban_rad4 := ban_rad3 + hch;
+ban_rad5 := ban_rad4 + hbs;
+
+% draw banner_center--gear_center;
+pair ban_rim[][];
+for r = 1 upto 5:
+  ban_rim[r][1] := banner_center + ban_rad[r] * dir(90-18-8-5);
+  ban_rim[r][2] := banner_center + ban_rad[r] * dir(90-18-8);
+  ban_rim[r][3] := banner_center + ban_rad[r] * dir(90-18);
+  ban_rim[r][4] := banner_center + ban_rad[r] * dir(90);
+  ban_rim[r][5] := banner_center + ban_rad[r] * dir(90+18);
+  ban_rim[r][6] := banner_center + ban_rad[r] * dir(90+18+8);
+  ban_rim[r][7] := banner_center + ban_rad[r] * dir(90+18+8+5);
+  % for i=1 upto 7: draw banner_center -- ban_rim[r][i]; endfor;
+endfor;
+% right-flap
+draw ban_rim[4][2]..ban_rim[4][1]
+     --ban_rim[1][1]..ban_rim[1][2]..ban_rim[1][3]--ban_rim[2][3];
+% the lines in the flaps.
+for i = 1 upto 2 :
+  draw point i*.33 of (ban_rim[1][1]..ban_rim[1][2])
+       -- point i*.33 of (ban_rim[4][1]..ban_rim[4][2]);
+endfor;
+for i = 0 upto 4 :
+  draw point i*.2 of (ban_rim[1][2]..ban_rim[1][3])
+       -- point i*.2 of (ban_rim[2][2]..ban_rim[2][3]);
+endfor;
+% left-flap
+draw ban_rim[4][6]..ban_rim[4][7]
+     --ban_rim[1][7]..ban_rim[1][6]..ban_rim[1][5]--ban_rim[2][5];
+% the lines in the flaps.
+for i = 1 upto 2 :
+  draw point i*.33 of (ban_rim[1][6]..ban_rim[1][7])
+       -- point i*.33 of (ban_rim[4][6]..ban_rim[4][7]);
+endfor;
+for i = 0 upto 4 :
+  draw point i*.2 of (ban_rim[1][6]..ban_rim[1][5])
+       -- point i*.2 of (ban_rim[2][6]..ban_rim[2][5]);
+endfor;
+
+% Now the main hindi banner frame.
+draw ban_rim[2][2]..ban_rim[2][3]..ban_rim[2][4]..ban_rim[2][5]..ban_rim[2][6];
+draw ban_rim[5][2]..ban_rim[5][3]..ban_rim[5][4]..ban_rim[5][5]..ban_rim[5][6];
+draw ban_rim[5][2]--ban_rim[2][2];
+draw ban_rim[5][6]--ban_rim[2][6];
+
+% \input banner_letters.mf
+%%% WRITING IN THE BANNER BELOW %%%
+message "The Hindi writing in the Banner: KNOWLEDGE IS SUPREME";
+% For writing inside the banner.
+hindi_char_width := 3/21;  % 18 char-width in t=0..3;
+hindi_inter_char_space := .1hindi_char_width; % inter-char-space
+
+path tline,bline;
+tline = ban_rim[4][6]..ban_rim[4][4]..ban_rim[4][2];
+bline = ban_rim[3][6]..ban_rim[3][4]..ban_rim[3][2];
+
+def topline(expr t) = point t of tline enddef;
+def botline(expr t) = point t of bline enddef;
+
+% draw tline; draw bline;
+
+def hup = topline(t)-botline(t) enddef;
+def hdown = botline(t)-topline(t) enddef;
+def hright = topline(t+hindi_char_width)-topline(t) enddef;
+def hleft = topline(t)-topline(t+hindi_char_width) enddef;
+
+% Picks a proportional point on the line top--bot.
+% each char has coordinates 0-to-10 X 0-to-10;
+def mid( expr fact, proppart ) =
+    (fact/10)[topline(t+proppart*hindi_char_width/10),botline(t+proppart*hindi_char_width/10)]
+enddef;
+
+numeric t;
+t:=.2;
+% "Ga"
+draw mid(0,3)--mid(0,14);
+draw mid(0,10)--mid(10,10);
+draw mid(4,10)--mid(4,6){hright}..{hdown}
+     mid(5,7.5) {hdown}...{hleft}
+     mid(7,5) {hleft}..{hup}
+     mid(6,3) {hright}..{hright}
+     mid(10,8);
+draw mid(0,14)--mid(10,14);
+t:=t+1.3hindi_char_width+hindi_inter_char_space;
+% "Na"
+draw mid(0,1)--mid(0,11);
+draw mid(0,10)--mid(10,10);
+draw mid(5,10)--mid(5,4)...
+     mid(6,3){hdown}..{hright}
+     mid(7,4){hright}..{hleft}
+     mid(5,4);
+t:=t+.9hindi_char_width+hindi_inter_char_space;
+% "Ma\"
+draw mid(0,1)--mid(0,11);
+draw mid(0,8)--mid(10,8)--mid(12,10);
+draw mid(5,8)--mid(5,4)...
+     mid(6,3){hdown}..{hright}
+     mid(7,4){hright}..{hleft}
+     mid(5,4)--mid(0,4);
+t:=t+1.4hindi_char_width+hindi_inter_char_space;
+% "Pa"
+draw mid(0,0)--mid(0,10);
+draw mid(0,8)--mid(10,8);
+draw mid(0,3){hdown}...{hright}mid(5,8);
+t:=t+.8hindi_char_width+hindi_inter_char_space;
+% "R"
+draw mid(0,0)--mid(0,10);
+draw mid(0,0) {hright}..{hdown} mid(2.5,6)
+     {hdown}..{hleft} mid(5,1.3)--mid(10,6);
+t:=t+.5hindi_char_width+hindi_inter_char_space;
+% "Ma"
+draw mid(0,1)--mid(0,11);
+draw mid(0,8)--mid(10,8);
+draw mid(5,8)--mid(5,4)...
+     mid(6,3){hdown}..{hright}
+     mid(7,4){hright}..{hleft}
+     mid(5,4)--mid(0,4);
+t:=t+.9hindi_char_width+hindi_inter_char_space;
+% "Ma\"
+draw mid(0,1)--mid(0,11);
+draw mid(0,8)--mid(10,8)--mid(12,10);
+draw mid(5,8)--mid(5,4)...
+     mid(6,3){hdown}..{hright}
+     mid(7,4){hright}..{hleft}
+     mid(5,4)--mid(0,4);
+t:=t+1.6hindi_char_width+hindi_inter_char_space;
+% "Dha"
+draw mid(-2,6){hleft}..{hdown}mid(1,0){hdown}..{hright}mid(4,6);
+draw mid(4,6){hleft}..{hdown}mid(6,0){hdown}..{hright}mid(8,6);
+t:=t+.6hindi_char_width+0hindi_inter_char_space;
+% "Ye"
+draw mid(0,0){hright}..{hdown}mid(2,3){hdown}..
+     {hleft}mid(5,0){hdown}..tension 5..{hup}mid(5,7);
+draw mid(0,0)--mid(0,8);
+draw mid(10,7)--mid(0,7)..{curl 100}mid(-4,0);
+t:=t+.8hindi_char_width+hindi_inter_char_space;
+% "Ya"
+draw mid(0,0){hright}..{hdown}mid(2,3){hdown}..
+     {hleft}mid(5,0){hdown}..tension 5..{hup}mid(5,7);
+draw mid(0,0)--mid(0,8);
+draw mid(10,7)--mid(0,7);
+t:=t+.6hindi_char_width+hindi_inter_char_space;
+% "Ma\"
+draw mid(0,1)--mid(0,11);
+draw mid(0,8)--mid(10,8)--mid(12,10);
+draw mid(5,8)--mid(5,4)...
+     mid(6,3){hdown}..{hright}
+     mid(7,4){hright}..{hleft}
+     mid(5,4)--mid(0,4);
+
+% \input open_book.mf
+%%% THE OPEN BOOK %%%
+message "The Book Outline";
+pair book[];
+
+book[1] :=gear_center + (0,-ra/3);
+book[10]:=book[1] +(0,-ra*1.3/6);
+book[5] :=book[10]+(0,-ra*.8/6);
+book[2] :=book[1]+(ra*2.4/6,0);
+book[9] :=book[1]+(-ra*2.1/6,0);
+book[3] :=(xpart(book[2])+ra*.5/6,ypart(book[10]));
+book[8] :=(xpart(book[9])-ra*.4/6,ypart(book[10]));
+book[4] :=(xpart(book[3]),ypart(book[5]));
+book[7] :=(xpart(book[8]),ypart(book[5]));
+
+draw book[1]{dir 30}..{dir 30}book[2]--book[3]
+   --book[4]{dir 190}..{dir 190}book[5]{dir 170}
+   ..{dir 170}book[7]--book[8]--book[9]{dir -30}
+   ..{dir -30}book[1]--book[10];
+draw book[8]{dir -35}..{dir -35}book[10]{dir 30}..{dir 30}book[3];
+draw book[10]..tension 4 and 1 ..book[5].. tension 1 and 4 .. cycle;
+
+% sign the book.
+% viz. Mohsin Ahmed/RS/CS&E/IIT/INDIA 400076
+for i=1 upto 3 :
+ draw (i/4)[book[9],book[8]]+(ra/10,0)
+   -- (i/4)[book[1],book[10]]+(-ra/10,0);
+ draw (i/4)[book[1],book[10]]+(ra/10,0)
+   -- (i/4)[book[2],book[3]]+(-ra/10,0);
+endfor;
+
+% \input flower_kamal.mf
+%%% THE FLOWER %%%
+message "The Flower Outline";
+pair flower_center,flower_low,petal_tip[], petal_base[];
+
+flower_center:= gear_center + (0,ra/6);
+flower_low   := gear_center + (0,-ra/6);
+petal_tip[1]:=flower_center+ra/2*dir( 25 );
+petal_tip[2]:=flower_center+ra/2*dir( 25+15 );
+petal_tip[3]:=flower_center+ra/2*dir( 25+15+15 );
+petal_tip[4]:=flower_center+ra/2*dir( 25+15+15+15 );
+petal_tip[5]:=flower_center+ra/2*dir( 90 );
+petal_tip[6]:=flower_center+ra/2*dir( 90+20 );
+petal_tip[7]:=flower_center+ra/2*dir( 90+20+15 );
+petal_tip[8]:=flower_center+ra/2*dir( 90+20+15+15 );
+petal_tip[9]:=flower_center+ra/2*dir( 90+20+15+15+15 );
+
+for i=1 upto 9 :
+  petal_base[i] := flower_center+((5-i)*ra/20,0);
+  % draw petal_base[i]--petal_tip[i];
+endfor;
+
+% Now draw the top_petals.
+draw petal_base[1]{dir   0}..{dir   0}petal_tip[1];
+draw petal_tip[1]{left}..{down}
+     point 0.6 of ( petal_base[2]{dir  10}..{dir  60}petal_tip[2] );
+draw petal_base[2]{dir  10}..{dir  60}petal_tip[2];
+draw petal_tip[2]{left}..{down}
+     point 0.6 of ( petal_base[3]{dir  10}..{dir  60}petal_tip[3] );
+draw petal_base[3]{dir  20}..{dir  70}petal_tip[3];
+draw petal_tip[3]{left}..{down}
+     point 0.6 of ( petal_base[4]{dir  10}..{dir  60}petal_tip[4] );
+draw petal_base[4]{dir  20}..{dir  80}petal_tip[4];
+draw petal_tip[4]{left}..{down}
+     point 0.7 of ( petal_base[5]{dir 40}..{dir  130}petal_tip[5] );
+draw petal_base[5]{dir  40}...{dir  130}petal_tip[5];
+
+draw petal_base[5]{dir  140}...{dir  50}petal_tip[5];
+draw petal_tip[6]{right}..{down}
+     point 0.7 of ( petal_base[5]{dir 140}..{dir 50}petal_tip[5] );
+draw petal_base[6]{dir  160}..{dir  100}petal_tip[6];
+draw petal_tip[7]{right}..{down}
+     point 0.6 of ( petal_base[6]{dir 160}..{dir 100}petal_tip[6] );
+draw petal_base[7]{dir 160}..{dir 110}petal_tip[7];
+draw petal_tip[8]{right}..{down}
+     point 0.6 of ( petal_base[7]{dir 160}..{dir 100}petal_tip[7] );
+draw petal_base[8]{dir 170}..{dir 120}petal_tip[8];
+draw petal_tip[9]{right}..{down}
+     point 0.6 of ( petal_base[8]{dir 170}..{dir 120}petal_tip[8] );
+draw petal_base[9]{dir 180}..{dir 180}petal_tip[9];
+
+% Now the three lower petals.
+pair petal_mid_l,petal_mid_r;
+petal_tip[10]:=(xpart(petal_tip[8]),ypart(gear_center));
+petal_tip[11]:=gear_center+(0,-ra/21);
+petal_tip[12]:=(xpart(petal_tip[2]),ypart(gear_center));
+petal_mid_l:= (xpart petal_base[8],ypart(gear_center)+ra/12);
+petal_mid_r:= (xpart petal_base[2],ypart(gear_center)+ra/12);
+
+draw flower_center{dir -40}..petal_mid_r ..{dir 140}petal_tip[11];
+draw flower_center{dir -140} ..petal_mid_l ..{dir 40}petal_tip[11];
+
+draw petal_mid_l ... flower_low ... petal_mid_r;
+draw petal_mid_l ..{dir 160}petal_tip[10];
+draw petal_mid_r ..{dir 20}petal_tip[12];
+
+draw flower_center{right}..{dir -60}petal_tip[12];
+draw flower_center{left}..{dir 240}petal_tip[10];
+draw petal_tip[10]{dir -60}..{dir 20}
+     point 0.5 of (petal_mid_l ... flower_low ... petal_mid_r);
+draw petal_tip[12]{dir 240}..{dir 160}
+     point 1.5 of (petal_mid_l ... flower_low ... petal_mid_r);
+
+% The flower stem
+draw (flower_low+( ra/100,0)){dir -100}..{dir -80}(book[1]+( ra/100,0));
+draw (flower_low+(-ra/100,0)){dir -100}..{dir -80}(book[1]+(-ra/100,0));
+
+endchar;
+
+%%%-here-we-are-%%%
+% read x; % a error, so that the mf invokes the editor here
+
+end;

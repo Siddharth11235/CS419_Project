@@ -1,0 +1,210 @@
+ \documentclass[15pt]{article}
+\usepackage{url}
+\usepackage{setspace}               
+\usepackage[superscript]{cite}      
+\usepackage{graphicx}               
+\usepackage[normalem]{ulem}   		
+\graphicspath{ {Figures/} }         
+\usepackage{caption} 
+\usepackage{cite}
+\usepackage{indentfirst} 
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{amsmath}  				
+\textwidth=6.5in                    
+\oddsidemargin=0.0in                
+\usepackage{listings}
+\usepackage{listings}
+\usepackage{fancyhdr} 
+\usepackage{longtable}
+\usepackage[table]{xcolor}
+\usepackage{hyperref}
+
+\usepackage[
+  separate-uncertainty = true,
+  multi-part-units = repeat
+]{siunitx}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Cancer Survival and Prognosis}
+\rhead{Page \thepage}
+
+
+
+\usepackage{color}   
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    citecolor=black,
+    linktoc=all, 
+    linkcolor=black,
+}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}} 
+
+\begin{document}
+\begin{center}
+\textsc{\LARGE CS419: Introduction to Machine Learning}\\[1.0cm]
+\textsc{\Large Project Report}
+
+\HRule \\[0.4cm]
+{ \huge \bfseries LSTM Wordsworth}\\[0.15cm] 
+\HRule \\[1.5cm]
+\end{center}
+
+\begin{minipage}{0.5\textwidth}
+\begin{flushleft} \large
+Siddharth Agarwal P17109 
+\end{flushleft}
+\end{minipage}
+~
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+Prof. Preethi Jyothi \\
+Computer Science and Engineering\\
+IIT Bombay
+
+\end{flushright}
+\end{minipage}\\[2cm]
+
+\begin{center}
+\includegraphics[width=60mm]{IIT_Bombay_logo.png}
+\end{center}
+
+\bigskip
+
+\newpage
+\tableofcontents
+\newpage
+
+\section{Motivation}
+A lot of work has been done over the past few decades in the domain of text generation. The primary targets for this domain have been based in prose for obvious reasons.  However, poetry is a domain of literature that deserves the reverence it receives. Poetry is a way to understand how language and symbol systems work. It is a worthy expression of emotion, or deep feelings, and aesthetics. Therefore it felt appropriate to attempt to generate poetry based on the work of possibly the most well-known poet of the old Romantic generation, William Wordsworth.
+
+\section{Background}
+Ever since Mikolov et al. demonstrated how to generate text using RNNs, neural language modelling has received a fever pitch of attention. Neural text generation has been thoroughly explored, with teams even coming up with algorithms that can amp up the emotional aspect of poetry (Misztal et al.).  One of the most interesting contributions here came in the form of a blog post by Andrej Karpathy, who demonstrated using RNNs to generate Shakespearean poetry. Multiple generative approaches have also seen success in the domain.
+
+\section{Objective}
+The initial objective here was to compare multiple discriminative and generative approaches to generate poetry and compare them via quantitative metrics such as perplexity and accuracy, and qualitatively, by asking people with academic experience in Literature about whether they would believe that the snippets presented to them were really from Wordsworth.
+
+However, I couldn't finish the generative approaches in time for the report. So for this project, I have attempted an analysis that compares the currently trendy recurrent neural networks architectures.
+
+
+\section{Dataset}
+The dataset here is the first volume of Shakespearean poetry out of an eight volume collection available on Project Gutenberg.  
+\subsection{Attributes of the Dataset}
+\begin{center}
+\begin{tabular}{c c}
+\textbf{Attribute} & \textbf{Values} \\
+No. of lines & 10902 \\
+No. of word tokens & 91093 \\
+Size of Vocabulary & 9940 \\
+No. of Individual Characters & 46
+\end{tabular}
+\end{center}
+
+
+%%% Algorithms 
+
+\section{Algorithms}
+\subsection{Preprocessing}
+\begin{itemize}
+\item The data was split into training, validation and test sets in the ratio 60:20:20. 
+\item Attributes 'race', 'therapy'  and 'type of cancer' were one hot encoded.
+\item Attributes 'TNM staging, T' and 'TNM staging, N' are graded attributes, so they are converted to numbers 1,2,3,4 and 0,1,2,3 respectively.
+\item All the columns are normalized as $X_{norm} = \frac{X - \text{mean}(X)}{\text{std}(X)}$
+\end{itemize}
+
+%K means Clustering
+\subsection{Character Level LSTM}
+\begin{center}
+\begin{tabular}{c c}
+Number of dimension in cluster & 16 \\
+Number of cluster & 20 \\
+Mean square error  & 0.5211 \\
+$\text{R}^{2}$ value & 0.6493 \\
+\end{tabular}
+\end{center}
+%PCA
+\subsection{Character Level GRU}
+As the cluster is difficult to analysis in 16 dimension so the plot of the cluster in two dimension by plotting two of its major components is -
+\begin{center}
+%\includegraphics[width=0.75\textwidth]{ML_photo.png}
+\end{center}
+The color shows all the points in a same cluster.
+
+% Linear SVR
+\subsection{Word Level GRU}
+Memory error due to large size of data size.
+
+\subsection{Word Level LSTM}
+\begin{center}
+\begin{tabular}{c c}
+Epsilon & 0 \\
+Penalty parameter C & 1 \\
+$\text{R}^{2}$ value & 0.28 \\
+\end{tabular}
+\end{center}
+
+% Neural Networks
+\subsection{Neural Networks}
+\begin{center}
+\begin{tabular}{c c}
+Number of hidden layers & 2 \\
+Number of units in layers & 48, 16 \\
+Dropout regularization in both layers & 0.1 \\
+Activation & ReLu \\
+Optimizer & Adam \\
+Batch Size & 100 \\
+Loss & Mean squared error \\
+Epochs & 15 \\ 
+$\text{R}^{2}$ value & 0.567 \\
+\end{tabular}
+\end{center}
+%Linear Regression
+\subsection{Linear Regression}
+Implemented basic linear regression with the Stochastic Gradient Descent algorithm and tuned the\\ \hspace*{4.5mm} learning rate to obtain the highest $\text{R}^{2}$ value possible with no regularization.\\
+\hspace*{5mm}$\text{R}^{2}$ value obtained = 0.438
+
+%Random Forest Regression
+\subsection{Random Forest Regression}
+\begin{center}
+\begin{tabular}{c c}
+Number of trees in ensemble & 30 \\
+Max depth of trees & 8 \\
+Cross validation & 5 fold \\
+$\text{R}^{2}$ value & 0.489 \\
+
+\end{tabular}
+\end{center}
+
+%HMM Regression
+\subsection{HMM Regression}
+We tried to implement an HMM Regression algorithm to add a generative approach to the regression \hspace*{5mm} problem as well but faced multiple hold ups while calculating the forward and backward probabilities \hspace*{5mm} and hence did not take it to completion.
+
+\section{Conclusion and Future Work}
+During our journey of collecting data and understanding and interpreting it, we got in touch with quite \hspace*{5mm} a lot of people who were actively involved in similar fields ranging from Project staff and medical students \hspace*{4.5mm} to professors working on building solutions for problems in related fields (like telepathology) through \hspace*{4.55mm}  whom we learned a lot about the current scenario of such projects. \\\hspace*{4.5mm} These interactions led us to the following conclusions :- \\
+\begin{itemize}
+\item We could use a similar approach like we did with SEER to obtain data in the Indian context from the Tata Memorial Hospital which would ideally be non-curated and could develop into a valuable project
+\item To tackle the problem of the genome sequence data being too large and hence having low workability, we could devise an algorithm which enables us to read and work on sections of the whole data (in the form of sentences instead of whole documents) and then implement our desired approach to identify the probability of cancerous mutations in that section
+\item We could expand our context to include images of tissue slices and work to flag abnormalities in these images to make the identification process faster for pathologists who look at enormous amounts of these images
+\end{itemize}
+
+\section{References}
+\subsection{SEER}
+\begin{itemize}
+\item \href{https://seer.cancer.gov/seertrack/data/request/}{Request for accessing data}
+\item \href{https://seer.cancer.gov/seerstat/software/}{SEER*Stat Installation}
+\item \href{https://seer.cancer.gov/seerstat/tutorials/case1a/webprint/}{Tutorial for accessing data}
+\end{itemize}
+\subsection{The 1000 Genome Project}
+\subsection{Others}
+\begin{itemize}
+\item \href{https://www.ncbi.nlm.nih.gov/pubmed/21763417}{Prediction of cancer causing missense variants}
+\item \href{https://www.nature.com/articles/nrclinonc.2013.110.pdf}{Liquid Biopsies for Cancer Genetics}
+\item \href{http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=379A5ECA015A0475240A921B9FF1A0AD?doi=10.1.1.78.4479&rep=rep1&type=pdf}{HMM Regression for Life Expectancy Prediction }
+\end{itemize}
+
+
+\end{document}
+
+
+
