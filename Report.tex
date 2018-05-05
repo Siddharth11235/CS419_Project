@@ -105,31 +105,51 @@ No. of Individual Characters & 46
 %%% Algorithms 
 
 \section{Algorithms}
-\subsection{Preprocessing}
+\subsection{Preparing the dataset}
+\subsubsection{Word Level}
 \begin{itemize}
-\item The data was split into training, validation and test sets in the ratio 60:20:20. 
-\item Attributes 'race', 'therapy'  and 'type of cancer' were one hot encoded.
-\item Attributes 'TNM staging, T' and 'TNM staging, N' are graded attributes, so they are converted to numbers 1,2,3,4 and 0,1,2,3 respectively.
-\item All the columns are normalized as $X_{norm} = \frac{X - \text{mean}(X)}{\text{std}(X)}$
+\item The data was stripped of any punctuation that was not era-appropriate.
+\item The data was then tokenised with spaces as the separator.
+\item The data was saved into a series of sequences each of lenght 11 tokens.
+\item The vocabulary was then created as an unsorted set of the word tokens.
+\end{itemize}
+\subsubsection{Character Level}
+\begin{itemize}
+\item The data was stripped of any punctuation that was not era-appropriate.
+\item The data was saved into a series of sequences each of lenght 50 tokens.
+\item The vocabulary was then created as an unsorted set of the character indices as used in the standard Keras example.
 \end{itemize}
 
-%K means Clustering
+
+\subsection*{Baseline Models}
+The baseline models used were the standard Keras example on text generation and Andrej Karpathy's char-RNN. Both models were meant for larger datasets and therefore ended up overfitting very quickly. However, a  bigram maximum likelihood (counting) baseine [4] did end up giving interesting results.
+
+
 \subsection{Character Level LSTM}
 \begin{center}
 \begin{tabular}{c c}
-Number of dimension in cluster & 16 \\
-Number of cluster & 20 \\
-Mean square error  & 0.5211 \\
-$\text{R}^{2}$ value & 0.6493 \\
+Number of LSTM layers & 1 \\
+Number of dense layers & 1 \\
+Number of nodes in the LSTM layer  & 135 \\
+Categorical Crossentropy loss value & 1.4259 \\
 \end{tabular}
 \end{center}
-%PCA
+The model, while displaying a very high loss value as compared to the word-level models performed well qualitatively. A sample poem has been attached below:\\
+\\
+and all the promptest of her moon of true tain,\\
+though and the song we the brow power,\\
+but the moral provice of the crown;\\
+the more than with some forms and bright, and power\\
+that spote not the spot when that her feet\\
+shall to the forth and that power of disming\\
+a right thought of countenance and spirit;\\
+and smiling and holls the shouch soft the fall and spot\\
+of pastage to the strong the noon-to the soun\\
+be the halled upon\\
+
+
 \subsection{Character Level GRU}
-As the cluster is difficult to analysis in 16 dimension so the plot of the cluster in two dimension by plotting two of its major components is -
-\begin{center}
-%\includegraphics[width=0.75\textwidth]{ML_photo.png}
-\end{center}
-The color shows all the points in a same cluster.
+The charac
 
 % Linear SVR
 \subsection{Word Level GRU}
@@ -180,6 +200,49 @@ $\text{R}^{2}$ value & 0.489 \\
 \subsection{HMM Regression}
 We tried to implement an HMM Regression algorithm to add a generative approach to the regression \hspace*{5mm} problem as well but faced multiple hold ups while calculating the forward and backward probabilities \hspace*{5mm} and hence did not take it to completion.
 
+
+\section{Comparison}
+\subsection*{Quantitative Metrics}
+The quantitative metrics used were accuracy, and Lidstone smoothed bigram perplexity.
+\begin{center}
+ \begin{tabular}{||c c c||} 
+ \hline
+ Model & Accuracy & Perplexity \\ [0.5ex] 
+ \hline\hline
+ Character Level LSTM & 0.5549 & 3.51661 \\ 
+ \hline
+ Character Level GRU & 0.4852 & 3.72655 \\
+ \hline
+ Word Level LSTM & 0.9056 & 2.42378 \\
+ \hline
+ Word Level GRU & 0.9108 & 2.40126 \\ [1ex] 
+ \hline
+\end{tabular}
+\end{center}
+
+It is interesting to note that the character level models appear quantitatively much worse than the word level models despite the poetry samples provided above, and the qualtitative results provided below not quite agreeing with it. 
+
+\subsection*{Qualitative Metric}
+I asked three people, each with a fair background in poetry, to rate the poem samples shown above on a integer-valued 100-point scale, with 100 indicating the poem being able to completely pass off as a work by Wordsworth, and 0 indicating that the text is gibberish.
+
+\begin{center}
+ \begin{tabular}{||c c c c||} 
+ \hline
+ Model & Reviewer 1 & Reviewer 2 & Reviewer 3 \\ [0.5ex] 
+ \hline\hline
+ Character Level LSTM & 65 & 70 & 70 \\ 
+ \hline
+ Character Level GRU & 62 & 65 & 68\\
+ \hline
+ Word Level LSTM & 69 & 75 & 75 \\
+ \hline
+ Word Level GRU & 71 & 75 & 80 \\ [1ex] 
+ \hline
+ \end{tabular}
+\end{center}
+There was a fair consensus amongst the reviewers that the poems would not pass off as Wordsworth because of the lack of meter, questionable grammar, and  the lack of his distinct rhyming schemes, but they were written in a language that would be common in the era, and the poetic themes that he commonly used were used here. Interestingly, the poems generated by both, the character and the word level models were rated close to each other despite the very sharp difference in their quantitative scores.
+
+
 \section{Conclusion and Future Work}
 During our journey of collecting data and understanding and interpreting it, we got in touch with quite \hspace*{5mm} a lot of people who were actively involved in similar fields ranging from Project staff and medical students \hspace*{4.5mm} to professors working on building solutions for problems in related fields (like telepathology) through \hspace*{4.55mm}  whom we learned a lot about the current scenario of such projects. \\\hspace*{4.5mm} These interactions led us to the following conclusions :- \\
 \begin{itemize}
@@ -187,6 +250,8 @@ During our journey of collecting data and understanding and interpreting it, we 
 \item To tackle the problem of the genome sequence data being too large and hence having low workability, we could devise an algorithm which enables us to read and work on sections of the whole data (in the form of sentences instead of whole documents) and then implement our desired approach to identify the probability of cancerous mutations in that section
 \item We could expand our context to include images of tissue slices and work to flag abnormalities in these images to make the identification process faster for pathologists who look at enormous amounts of these images
 \end{itemize}
+
+
 
 \section{References}
 \subsection{SEER}
