@@ -26,7 +26,7 @@
 ]{siunitx}
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{Cancer Survival and Prognosis}
+\lhead{Recurrent Wordsworth}
 \rhead{Page \thepage}
 
 
@@ -43,11 +43,11 @@
 
 \begin{document}
 \begin{center}
-\textsc{\LARGE CS419: Introduction to Machine Learning}\\[1.0cm]
+\textsc{\LARGE CS419M: Introduction to Machine Learning}\\[1.0cm]
 \textsc{\Large Project Report}
 
 \HRule \\[0.4cm]
-{ \huge \bfseries LSTM Wordsworth}\\[0.15cm] 
+{ \huge \bfseries Recurrent Wordsworth}\\[0.15cm] 
 \HRule \\[1.5cm]
 \end{center}
 
@@ -80,12 +80,12 @@ IIT Bombay
 A lot of work has been done over the past few decades in the domain of text generation. The primary targets for this domain have been based in prose for obvious reasons.  However, poetry is a domain of literature that deserves the reverence it receives. Poetry is a way to understand how language and symbol systems work. It is a worthy expression of emotion, or deep feelings, and aesthetics. Therefore it felt appropriate to attempt to generate poetry based on the work of possibly the most well-known poet of the old Romantic generation, William Wordsworth.
 
 \section{Background}
-Ever since Mikolov et al. demonstrated how to generate text using RNNs, neural language modelling has received a fever pitch of attention. Neural text generation has been thoroughly explored, with teams even coming up with algorithms that can amp up the emotional aspect of poetry (Misztal et al.).  One of the most interesting contributions here came in the form of a blog post by Andrej Karpathy, who demonstrated using RNNs to generate Shakespearean poetry. Multiple generative approaches have also seen success in the domain.
+Ever since Mikolov et al. demonstrated how to model language using RNNs, neural language modelling has received a fever pitch of attention. Neural text generation has been thoroughly explored, with teams even coming up with algorithms that can amp up the emotional aspect of poetry (Misztal et al.).  One of the most interesting contributions here came in the form of a blog post by Andrej Karpathy, who demonstrated using RNNs to generate Shakespearean poetry. Multiple generative approaches have also seen success in the domain.
 
 \section{Objective}
-The initial objective here was to compare multiple discriminative and generative approaches to generate poetry and compare them via quantitative metrics such as perplexity and accuracy, and qualitatively, by asking people with academic experience in Literature about whether they would believe that the snippets presented to them were really from Wordsworth.
+The initial objective here was to compare multiple discriminative and generative approaches to generate poetry and compare them via quantitative metrics such as perplexity and accuracy, and qualitatively, by asking people with academic experience in Literature about whether they would believe that the snippets presented to them were really from Wordsworth. Also, the time taken for training has been compared.
 
-However, I couldn't finish the generative approaches in time for the report. So for this project, I have attempted an analysis that compares the currently trendy recurrent neural networks architectures.
+However, I couldn't finish the generative approaches in time for the report. So for this project, I have attempted an analysis that compares the currently well-known recurrent neural networks architectures.
 
 
 \section{Dataset}
@@ -106,6 +106,7 @@ No. of Individual Characters & 46
 
 \section{Algorithms}
 \subsection{Preparing the dataset}
+At the end of each conversion, every element is taken and expressed as a one-hot vector of length  of the size of the vocabulary.
 \subsubsection{Word Level}
 \begin{itemize}
 \item The data was stripped of any punctuation that was not era-appropriate.
@@ -128,9 +129,10 @@ The baseline models used were the standard Keras example on text generation and 
 \subsection{Character Level LSTM}
 \begin{center}
 \begin{tabular}{c c}
-Number of LSTM layers & 1 \\
+Number of recurrent layers & 1 \\
 Number of dense layers & 1 \\
-Number of nodes in the LSTM layer  & 135 \\
+Number of LSTM nodes in the recurrent layer  & 135 \\
+Optimizer & RMSProp \\
 Categorical Crossentropy loss value & 1.4259 \\
 \end{tabular}
 \end{center}
@@ -149,57 +151,80 @@ be the halled upon\\
 
 
 \subsection{Character Level GRU}
-The charac
+\begin{center}
+\begin{tabular}{c c}
+Number of recurrent layers & 1 \\
+Number of dense layers & 1 \\
+Number of GRU nodes in the recurrent layer  & 136 \\
+Optimizer & Nesterov Adam \\
+Categorical Crossentropy loss value & 1.4109 \\
+\end{tabular}
+\end{center}
+The model, while displaying a high loss value as compared to the word-level models performed well qualitatively. It also performed better than the corresponding LSTM model. A sample poem has been attached below:\\\\
+with an astonishment but ill suppressed and too,\\
+where the endless some was all the she perise to heart\\
+of the roams and summer solitude,\\
+the short the like a notens lempth, by faint\\
+that had rear and charmings or my night, we lime\\
+dence the less her all to harmony;\\
+the strange the sensish bright to deep solitude\\
+where the lasting track the sunmin life;\\
+in a grief of the sad a light such asside\\
+the tender the transie present the grown\\
 
-% Linear SVR
-\subsection{Word Level GRU}
-Memory error due to large size of data size.
 
 \subsection{Word Level LSTM}
 \begin{center}
 \begin{tabular}{c c}
-Epsilon & 0 \\
-Penalty parameter C & 1 \\
-$\text{R}^{2}$ value & 0.28 \\
-\end{tabular}
-\end{center}
-
-% Neural Networks
-\subsection{Neural Networks}
-\begin{center}
-\begin{tabular}{c c}
-Number of hidden layers & 2 \\
-Number of units in layers & 48, 16 \\
-Dropout regularization in both layers & 0.1 \\
-Activation & ReLu \\
+Number of Embedding Layers & 1\\
+Number of recurrent layers & 2 \\
+Number of dense layers & 2 \\
+Number of LSTM nodes in the recurrent layers  & 256 \\
 Optimizer & Adam \\
-Batch Size & 100 \\
-Loss & Mean squared error \\
-Epochs & 15 \\ 
-$\text{R}^{2}$ value & 0.567 \\
+Categorical Crossentropy loss value & 0.0352 \\
 \end{tabular}
 \end{center}
-%Linear Regression
-\subsection{Linear Regression}
-Implemented basic linear regression with the Stochastic Gradient Descent algorithm and tuned the\\ \hspace*{4.5mm} learning rate to obtain the highest $\text{R}^{2}$ value possible with no regularization.\\
-\hspace*{5mm}$\text{R}^{2}$ value obtained = 0.438
 
-%Random Forest Regression
-\subsection{Random Forest Regression}
+The Word Level LSTM performed remarkably well on the quantitative metrics despite the lack of availability of memory. As will also be seen, the word level model is less expressive in terms of punctuation as compared to a character level model. A sample poem has been attached below:\\\\
+roman confidence a faith that fails not in all sorrow my\\
+support the vision whom at me hath looked from that we passed bend \\
+ with flight to take the prophecy here saw among the \\
+ female ice a shock rise above the naked trees that feared despised\\ 
+ diffused wild and hence eaglelike books where works the rattling heaped \\
+ along the billowy his youth and yet the fish shower see the \\
+ western valley who was weak likewise of the living world \\
+ the boy was spent and i either are in any \\
+ open soil of men meanwhile her ungrateful cell were taken \\
+ commingled like a white sea turns for the green lake \\
+
+
+\subsection{Word Level GRU}
 \begin{center}
 \begin{tabular}{c c}
-Number of trees in ensemble & 30 \\
-Max depth of trees & 8 \\
-Cross validation & 5 fold \\
-$\text{R}^{2}$ value & 0.489 \\
-
+Number of Embedding Layers & 1\\
+Number of recurrent layers & 2 \\
+Number of dense layers & 2 \\
+Number of GRU nodes in the recurrent layers  & 225 \\
+Optimizer & Adam \\
+Categorical Crossentropy loss value & 0.0304 \\
 \end{tabular}
 \end{center}
 
-%HMM Regression
-\subsection{HMM Regression}
-We tried to implement an HMM Regression algorithm to add a generative approach to the regression \hspace*{5mm} problem as well but faced multiple hold ups while calculating the forward and backward probabilities \hspace*{5mm} and hence did not take it to completion.
+The Word Level GRU performed well on the quantitative metrics despite the lack of availability of memory. They were, by a slight margin, the best performer on the quantitative metrics, and trained a fair bit more quickly as compared to the word level LSTM. A sample poem has been attached below:\\\\
+uncouth vagrants passed in fear have walked with quicker step but\\
+dark ye hill and were a awful mistaken and one \\
+ blind sailor the to bees what breathe remote were happier \\
+ through a horse of england first already pains of shortlived \\
+ ambition which for this not left me with the words of \\
+ nature though have seen us poor spirit fast and in \\
+ perfect truth of love as he is its god \\
+ tis such the melancholy eve of our fathers mind can note \\
+ no more that thou among music cling as if he was bent both \\
+ when in the pure sinkings of this cause how then plays though\\
 
+
+\subsection{Generative Models}
+I tried to implement an HMM text generation model as described by Szymanski et al. to add a generative take to the problem, other than the classical n-gram models. I faced multiple difficulties, specifically in calculating probabilities, and therefore could not implement it in time. Beyond that, as a more ambitious display, a consideration to implement a GAN for the task was also made, but owing to a lack of time, was discarded.
 
 \section{Comparison}
 \subsection*{Quantitative Metrics}
@@ -211,7 +236,7 @@ The quantitative metrics used were accuracy, and Lidstone smoothed bigram perple
  \hline\hline
  Character Level LSTM & 0.5549 & 3.51661 \\ 
  \hline
- Character Level GRU & 0.4852 & 3.72655 \\
+ Character Level GRU & 0.5565 & 3.51009 \\
  \hline
  Word Level LSTM & 0.9056 & 2.42378 \\
  \hline
@@ -242,30 +267,45 @@ I asked three people, each with a fair background in poetry, to rate the poem sa
 \end{center}
 There was a fair consensus amongst the reviewers that the poems would not pass off as Wordsworth because of the lack of meter, questionable grammar, and  the lack of his distinct rhyming schemes, but they were written in a language that would be common in the era, and the poetic themes that he commonly used were used here. Interestingly, the poems generated by both, the character and the word level models were rated close to each other despite the very sharp difference in their quantitative scores.
 
+\subsection{Time taken for training}
+\begin{center}
+ \begin{tabular}{||c c||} 
+ \hline
+ Model & Time Taken in minutes and seconds \\ [0.5ex] 
+ \hline\hline
+ Character Level LSTM & 38:05 \\ 
+ \hline
+ Character Level GRU & 37:58\\
+ \hline
+ Word Level LSTM & 304:11 \\
+ \hline
+ Word Level GRU & 298:49 \\ [1ex] 
+ \hline
+ \end{tabular}
+\end{center}
+
+It is well worth noting that while the character level models did not hold up on the quantitative metrics, they generated passable poems, and more importantly, they were trained a fraction of the time it took to implement the word level models. The GRU models performed better in both cases, even if it was slightly so.
 
 \section{Conclusion and Future Work}
-During our journey of collecting data and understanding and interpreting it, we got in touch with quite \hspace*{5mm} a lot of people who were actively involved in similar fields ranging from Project staff and medical students \hspace*{4.5mm} to professors working on building solutions for problems in related fields (like telepathology) through \hspace*{4.55mm}  whom we learned a lot about the current scenario of such projects. \\\hspace*{4.5mm} These interactions led us to the following conclusions :- \\
-\begin{itemize}
-\item We could use a similar approach like we did with SEER to obtain data in the Indian context from the Tata Memorial Hospital which would ideally be non-curated and could develop into a valuable project
-\item To tackle the problem of the genome sequence data being too large and hence having low workability, we could devise an algorithm which enables us to read and work on sections of the whole data (in the form of sentences instead of whole documents) and then implement our desired approach to identify the probability of cancerous mutations in that section
-\item We could expand our context to include images of tissue slices and work to flag abnormalities in these images to make the identification process faster for pathologists who look at enormous amounts of these images
-\end{itemize}
+The experiment above was to evaluate the abilities of sequence models in the realm of generating poetry. While it is clear that using a modest local machine and about 17\% of Wordsworth's poetry  is not going to result in poems that can reasonably be close to his actual work, it does go on to show that we can get close even on these. 
+\\
+GRUs have been treated as a computationally efficient alternative to LSTMs without having to worry about effectiveness. The results obtained here, rudimentary as they may be, are ambivalent about this assertion as at the Character level, GRU computational performance matched that of the LSTMs and on word level models, the GRUs gave a slightly better performance.
+\\
+In the sight of my failure in implementing the generative models, a future task can be to evaluate HMM models, autoencoders, and GANs on NLP tasks. Another interesting direction can be to test on the dataset an idea by Christopher Manning that goes "Basically, if you want to do a NLP task, no matter what it is, what you should do is throw your data into a bi-directional long-short term memory network, and augment its information flow with attention mechanism."
+
 
 
 
 \section{References}
-\subsection{SEER}
 \begin{itemize}
-\item \href{https://seer.cancer.gov/seertrack/data/request/}{Request for accessing data}
-\item \href{https://seer.cancer.gov/seerstat/software/}{SEER*Stat Installation}
-\item \href{https://seer.cancer.gov/seerstat/tutorials/case1a/webprint/}{Tutorial for accessing data}
-\end{itemize}
-\subsection{The 1000 Genome Project}
-\subsection{Others}
-\begin{itemize}
-\item \href{https://www.ncbi.nlm.nih.gov/pubmed/21763417}{Prediction of cancer causing missense variants}
-\item \href{https://www.nature.com/articles/nrclinonc.2013.110.pdf}{Liquid Biopsies for Cancer Genetics}
-\item \href{http://citeseerx.ist.psu.edu/viewdoc/download;jsessionid=379A5ECA015A0475240A921B9FF1A0AD?doi=10.1.1.78.4479&rep=rep1&type=pdf}{HMM Regression for Life Expectancy Prediction }
+\item \href{http://www.fit.vutbr.cz/research/groups/speech/publi/2010/mikolov_interspeech2010_IS100722.pdf}{Mikolov et al. (2010) Recurrent neural network based language model}
+\item  \href{https://pdfs.semanticscholar.org/d89d/053b1c2481088b1af2bd36e0a6d959ff1373.pdf} {Misztal et al. (2017). Poetry generation system with an emotional personality}
+\item \href{http://karpathy.github.io/2015/05/21/rnn-effectiveness/}{Andrej Karpathy (2017). The Unreasonable Effectiveness of Recurrent Neural Networks.}
+
+\item \href{http://nbviewer.jupyter.org/gist/yoavg/d76121dfde2618422139}{The unreasonable effectiveness of Character-level Language Models (and why RNNs are still cool) (2017)}
+
+\item \href{https://pdfs.semanticscholar.org/cb06/a81281a394a3eddd9e2cb8f409490c858782.pdf} {Szymanski et al. Hidden Markov Models Suitable for Text Generation}
+\item \href{https://nlp.stanford.edu/~manning/talks/Simons-Institute-Manning-2017.pdf}{Christopher Manning (2017) Representations for Language: From Word Embeddings to Sentence Meanings}
 \end{itemize}
 
 
